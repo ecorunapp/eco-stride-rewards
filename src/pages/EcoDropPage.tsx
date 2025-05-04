@@ -1,56 +1,46 @@
 
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Activity } from "lucide-react";
+import { Package } from "lucide-react";
 
 const EcoDropPage = () => {
   return (
     <div className="container max-w-md mx-auto px-4 py-8">
       <header className="mb-6">
         <h1 className="text-2xl font-bold text-primary mb-2">EcoDrop+</h1>
-        <p className="text-sm text-muted-foreground">Complete eco-tasks for bonus rewards</p>
+        <p className="text-sm text-muted-foreground">Complete eco-tasks for rewards</p>
       </header>
       
       <Card className="mb-8">
-        <CardContent className="p-6 flex flex-col items-center justify-center text-center">
-          <div className="w-16 h-16 rounded-full bg-eco-blue/20 flex items-center justify-center mb-4">
-            <Activity className="h-8 w-8 text-eco-blue" />
+        <CardContent className="p-6">
+          <div className="flex items-center space-x-4 mb-4">
+            <div className="bg-eco-green/20 p-3 rounded-full">
+              <Package className="h-6 w-6 text-eco-green" />
+            </div>
+            <div>
+              <h2 className="text-lg font-medium">Task Board</h2>
+              <p className="text-sm text-muted-foreground">Find and complete tasks in your area</p>
+            </div>
           </div>
-          <h2 className="text-xl font-semibold mb-2">Coming Soon!</h2>
-          <p className="text-muted-foreground">
-            EcoDrop+ will let you complete eco-friendly tasks around your city for bonus rewards!
-          </p>
+          
+          <div className="mt-4 space-y-4">
+            <div className="p-4 border border-border rounded-lg">
+              <h3 className="font-medium mb-1">Available Tasks</h3>
+              <p className="text-sm text-muted-foreground">Browse eco-friendly tasks near you</p>
+            </div>
+            
+            <div className="p-4 border border-border rounded-lg">
+              <h3 className="font-medium mb-1">Your Active Tasks</h3>
+              <p className="text-sm text-muted-foreground">Track tasks you're currently working on</p>
+            </div>
+            
+            <div className="p-4 border border-border rounded-lg">
+              <h3 className="font-medium mb-1">Completed Tasks</h3>
+              <p className="text-sm text-muted-foreground">View your history and total earnings</p>
+            </div>
+          </div>
         </CardContent>
       </Card>
-      
-      <section>
-        <h2 className="text-lg font-medium mb-4">Future Features</h2>
-        <div className="space-y-4">
-          {[
-            {
-              title: "Location-Based Tasks",
-              description: "Find and complete eco-friendly tasks near you"
-            },
-            {
-              title: "Eco Challenges",
-              description: "Join weekly sustainability challenges"
-            },
-            {
-              title: "Community Clean-ups",
-              description: "Organize and participate in local clean-up events"
-            },
-            {
-              title: "Green Businesses",
-              description: "Discover and support sustainable businesses"
-            }
-          ].map((feature, index) => (
-            <div key={index} className="p-4 border border-border rounded-lg">
-              <h3 className="font-medium">{feature.title}</h3>
-              <p className="text-sm text-muted-foreground">{feature.description}</p>
-            </div>
-          ))}
-        </div>
-      </section>
     </div>
   );
 };

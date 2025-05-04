@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, Wallet, Activity, User } from "lucide-react";
+import { Home, Wallet, Activity, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const BottomNav = () => {
@@ -14,6 +14,11 @@ const BottomNav = () => {
       path: "/",
     },
     {
+      icon: Users,
+      label: "MeetFlare",
+      path: "/meetflare",
+    },
+    {
       icon: Wallet,
       label: "Wallet",
       path: "/wallet",
@@ -22,12 +27,7 @@ const BottomNav = () => {
       icon: Activity,
       label: "EcoDrop+",
       path: "/ecodrop",
-    },
-    {
-      icon: User,
-      label: "Profile",
-      path: "/profile",
-    },
+    }
   ];
   
   return (

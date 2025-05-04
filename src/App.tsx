@@ -10,6 +10,9 @@ import Home from "@/pages/Home";
 import WalletPage from "@/pages/WalletPage";
 import EcoDropPage from "@/pages/EcoDropPage";
 import ProfilePage from "@/pages/ProfilePage";
+import MeetFlarePage from "@/pages/MeetFlarePage";
+import RunfluencePage from "@/pages/RunfluencePage";
+import MoveMatePage from "@/pages/MoveMatePage";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +27,9 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
+              <Route path="meetflare" element={<MeetFlarePage />} />
+              <Route path="runfluence" element={<RunfluencePage />} />
+              <Route path="movemate" element={<MoveMatePage />} />
               <Route path="wallet" element={<WalletPage />} />
               <Route path="ecodrop" element={<EcoDropPage />} />
               <Route path="profile" element={<ProfilePage />} />

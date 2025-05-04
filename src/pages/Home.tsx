@@ -7,6 +7,7 @@ import CoinDisplay from "@/components/CoinDisplay";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Users, Footprints, ArrowUpFromLine, Package } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   const { steps, coins, incrementSteps } = useUserData();
@@ -54,28 +55,36 @@ const Home = () => {
 
         {/* Feature Icons Section */}
         <div className="w-full mt-4">
-          <h3 className="font-medium mb-4">Coming Soon Features</h3>
+          <h3 className="font-medium mb-4">Featured Services</h3>
           <div className="grid grid-cols-2 gap-4">
-            <FeatureCard 
-              icon={<Users className="h-6 w-6 text-eco-blue" />}
-              title="MeetFlare"
-              description="Match & Run"
-            />
-            <FeatureCard 
-              icon={<Footprints className="h-6 w-6 text-eco-green" />}
-              title="Runfluence"
-              description="Creator system"
-            />
-            <FeatureCard 
-              icon={<ArrowUpFromLine className="h-6 w-6 text-eco-blue" />}
-              title="MoveMate+"
-              description="Smart rentals"
-            />
-            <FeatureCard 
-              icon={<Package className="h-6 w-6 text-eco-green" />}
-              title="EcoDrop+"
-              description="Task system"
-            />
+            <Link to="/meetflare">
+              <FeatureCard 
+                icon={<Users className="h-6 w-6 text-eco-blue" />}
+                title="MeetFlare"
+                description="Match & Run"
+              />
+            </Link>
+            <Link to="/runfluence">
+              <FeatureCard 
+                icon={<Footprints className="h-6 w-6 text-eco-green" />}
+                title="Runfluence"
+                description="Creator system"
+              />
+            </Link>
+            <Link to="/movemate">
+              <FeatureCard 
+                icon={<ArrowUpFromLine className="h-6 w-6 text-eco-blue" />}
+                title="MoveMate+"
+                description="Smart rentals"
+              />
+            </Link>
+            <Link to="/ecodrop">
+              <FeatureCard 
+                icon={<Package className="h-6 w-6 text-eco-green" />}
+                title="EcoDrop+"
+                description="Task system"
+              />
+            </Link>
           </div>
         </div>
       </div>
@@ -83,7 +92,7 @@ const Home = () => {
   );
 };
 
-// Feature card component for displaying upcoming features
+// Feature card component for displaying features
 const FeatureCard = ({ icon, title, description }) => {
   return (
     <Card className="border border-border hover:border-primary/40 transition-colors">
