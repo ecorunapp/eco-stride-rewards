@@ -6,7 +6,7 @@ import StepCounter from "@/components/StepCounter";
 import CoinDisplay from "@/components/CoinDisplay";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Users, Running, ArrowUpFromLine, Package } from "lucide-react";
+import { Users, Footprints, ArrowUpFromLine, Package } from "lucide-react";
 
 const Home = () => {
   const { steps, coins, incrementSteps } = useUserData();
@@ -62,7 +62,7 @@ const Home = () => {
               description="Match & Run"
             />
             <FeatureCard 
-              icon={<Running className="h-6 w-6 text-eco-green" />}
+              icon={<Footprints className="h-6 w-6 text-eco-green" />}
               title="Runfluence"
               description="Creator system"
             />
