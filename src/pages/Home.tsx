@@ -5,6 +5,8 @@ import { getMotivationalMessage, useCurrentDate } from "@/lib/utils";
 import StepCounter from "@/components/StepCounter";
 import CoinDisplay from "@/components/CoinDisplay";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Users, Run, ArrowUpFromLine, Package } from "lucide-react";
 
 const Home = () => {
   const { steps, coins, incrementSteps } = useUserData();
@@ -49,8 +51,50 @@ const Home = () => {
             That's approximately {(steps * 0.0008).toFixed(2)} km walked!
           </p>
         </div>
+
+        {/* Feature Icons Section */}
+        <div className="w-full mt-4">
+          <h3 className="font-medium mb-4">Coming Soon Features</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <FeatureCard 
+              icon={<Users className="h-6 w-6 text-eco-blue" />}
+              title="MeetFlare"
+              description="Match & Run"
+            />
+            <FeatureCard 
+              icon={<Run className="h-6 w-6 text-eco-green" />}
+              title="Runfluence"
+              description="Creator system"
+            />
+            <FeatureCard 
+              icon={<ArrowUpFromLine className="h-6 w-6 text-eco-blue" />}
+              title="MoveMate+"
+              description="Smart rentals"
+            />
+            <FeatureCard 
+              icon={<Package className="h-6 w-6 text-eco-green" />}
+              title="EcoDrop+"
+              description="Task system"
+            />
+          </div>
+        </div>
       </div>
     </div>
+  );
+};
+
+// Feature card component for displaying upcoming features
+const FeatureCard = ({ icon, title, description }) => {
+  return (
+    <Card className="border border-border hover:border-primary/40 transition-colors">
+      <CardContent className="flex flex-col items-center p-4 text-center">
+        <div className="mb-2 bg-muted p-2 rounded-full">
+          {icon}
+        </div>
+        <h4 className="font-medium text-sm">{title}</h4>
+        <p className="text-xs text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
   );
 };
 
