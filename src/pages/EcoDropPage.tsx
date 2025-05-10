@@ -9,6 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useUserData } from "@/contexts/UserDataContext";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import SimpleMap from "@/components/SimpleMap";
+import TransportMethodSelector, { TransportMethod } from "@/components/TransportMethodSelector";
+import { useToast } from "@/hooks/use-toast";
 
 // Task type definition
 interface Task {
@@ -20,7 +23,7 @@ interface Task {
   reward: string;
   rewardPoints: number;
   postedBy?: string;
-  status?: "available" | "active" | "completed";
+  status?: "available" | "active" | "completed" | "accepted";
   description?: string;
   date?: string;
 }
@@ -70,7 +73,9 @@ const EcoDropPage = () => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
   const [isNearbyTasksOpen, setIsNearbyTasksOpen] = useState(false);
+  const [showMethodSelector, setShowMethodSelector] = useState(false);
   const { addCompletedTask } = useUserData();
+  const { toast } = useToast();
 
   // Mock task data
   const availableTasks: Task[] = [
@@ -204,9 +209,6 @@ const EcoDropPage = () => {
 
   const handleClaimTask = () => {
     if (selectedTask) {
-      // In a real app, this would involve API calls and state updates
-      setIsTaskDialogOpen(false);
-      // For demo purposes, we'll just show a completed status
       if (selectedTask.status === "completed") {
         // If the task is already completed, add it to completed tasks list in UserDataContext
         addCompletedTask({
@@ -215,8 +217,35 @@ const EcoDropPage = () => {
           reward: selectedTask.rewardPoints,
           date: selectedTask.date || new Date().toLocaleDateString()
         });
+        setIsTaskDialogOpen(false);
+      } else {
+        // For available tasks, show the method selector
+        setShowMethodSelector(true);
       }
     }
+  };
+
+  const handleMethodSelect = (method: TransportMethod) => {
+    // Update the task status to accepted
+    if (selectedTask) {
+      setSelectedTask({
+        ...selectedTask,
+        status: "accepted"
+      });
+      
+      // Show confirmation and close the method selector
+      toast({
+        title: "Task accepted!",
+        description: `You'll be using ${method.replace('_', ' ')} for this task.`,
+        duration: 5000,
+      });
+      
+      setShowMethodSelector(false);
+    }
+  };
+
+  const handleMethodCancel = () => {
+    setShowMethodSelector(false);
   };
 
   const handleFindTasksNearMe = () => {
@@ -317,6 +346,11 @@ const EcoDropPage = () => {
 
           {selectedTask && (
             <div className="space-y-4">
+              {/* Show map for the task when task is accepted or being viewed */}
+              {(showMethodSelector || selectedTask.status === "accepted") && (
+                <SimpleMap destination={selectedTask.location} />
+              )}
+              
               <div className="flex items-center gap-2 text-sm">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
                 <span>{selectedTask.location}</span>
@@ -342,28 +376,39 @@ const EcoDropPage = () => {
                 <p>{selectedTask.description}</p>
               </div>
               
-              <div className="flex items-center justify-between mt-4">
-                <div className="flex items-center gap-1 text-primary font-medium">
-                  <Award className="h-5 w-5" />
-                  <span>{selectedTask.reward}</span>
+              {/* Transportation Method Selector */}
+              {showMethodSelector ? (
+                <TransportMethodSelector 
+                  onSelect={handleMethodSelect}
+                  onCancel={handleMethodCancel}
+                />
+              ) : (
+                <div className="flex items-center justify-between mt-4">
+                  <div className="flex items-center gap-1 text-primary font-medium">
+                    <Award className="h-5 w-5" />
+                    <span>{selectedTask.reward}</span>
+                  </div>
+                  
+                  <Button 
+                    onClick={handleClaimTask}
+                    className={selectedTask.status === "completed" ? "bg-green-600 hover:bg-green-700" : 
+                              selectedTask.status === "accepted" ? "bg-eco-blue hover:bg-eco-blue/90" : ""}
+                  >
+                    {selectedTask.status === "completed" ? (
+                      <>
+                        <Check className="mr-1 h-4 w-4" />
+                        Completed
+                      </>
+                    ) : selectedTask.status === "active" ? (
+                      "Mark as Complete"
+                    ) : selectedTask.status === "accepted" ? (
+                      "Start Navigation"
+                    ) : (
+                      "Accept Task"
+                    )}
+                  </Button>
                 </div>
-                
-                <Button 
-                  onClick={handleClaimTask}
-                  className={selectedTask.status === "completed" ? "bg-green-600 hover:bg-green-700" : ""}
-                >
-                  {selectedTask.status === "completed" ? (
-                    <>
-                      <Check className="mr-1 h-4 w-4" />
-                      Completed
-                    </>
-                  ) : selectedTask.status === "active" ? (
-                    "Mark as Complete"
-                  ) : (
-                    "Accept Task"
-                  )}
-                </Button>
-              </div>
+              )}
             </div>
           )}
         </DialogContent>
@@ -399,4 +444,3 @@ const EcoDropPage = () => {
 };
 
 export default EcoDropPage;
-

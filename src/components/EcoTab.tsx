@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { cn, formatNumber } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
-import { Coins, ChevronDown, ChevronUp, Package, Award } from "lucide-react";
+import { Coins, ChevronDown, ChevronUp, Package, Award, CheckCircle2 } from "lucide-react";
 import { useUserData } from "@/contexts/UserDataContext";
 import { Button } from "@/components/ui/button";
 
@@ -70,9 +70,14 @@ const EcoTab = ({ coinBalance, className }: EcoTabProps) => {
                     <p className="text-muted-foreground">{task.date}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-1 text-primary">
-                  <Award className="h-3 w-3" />
-                  <span>{task.reward}</span>
+                <div className="flex items-center gap-2">
+                  <div className="text-eco-green">
+                    <CheckCircle2 className="h-3 w-3" />
+                  </div>
+                  <div className="flex items-center gap-1 text-primary">
+                    <Award className="h-3 w-3" />
+                    <span>{task.reward}</span>
+                  </div>
                 </div>
               </div>
             ))}
@@ -91,4 +96,3 @@ const EcoTab = ({ coinBalance, className }: EcoTabProps) => {
 };
 
 export default EcoTab;
-
