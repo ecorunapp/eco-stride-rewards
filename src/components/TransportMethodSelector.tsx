@@ -3,7 +3,8 @@ import React from "react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Bike, Car, Walk, Wheelchair, Move, ElectricWheelchair } from "lucide-react";
+import { Bike, Car, PersonStanding, Move } from "lucide-react";
+import ElectricWheelchair from "@/components/icons/ElectricWheelchair";
 
 export type TransportMethod = 
   | "run" 
@@ -45,7 +46,7 @@ const TransportMethodSelector: React.FC<TransportMethodSelectorProps> = ({
             <RadioGroupItem value="run" id="run" />
             <Label htmlFor="run" className="flex items-center gap-2 cursor-pointer">
               <span className="bg-eco-green/10 p-1.5 rounded-full">
-                <Walk className="h-4 w-4 text-eco-green" />
+                <PersonStanding className="h-4 w-4 text-eco-green" />
               </span>
               Run
             </Label>
@@ -65,7 +66,7 @@ const TransportMethodSelector: React.FC<TransportMethodSelectorProps> = ({
             <RadioGroupItem value="walk" id="walk" />
             <Label htmlFor="walk" className="flex items-center gap-2 cursor-pointer">
               <span className="bg-eco-green/10 p-1.5 rounded-full">
-                <Walk className="h-4 w-4 text-eco-green" />
+                <PersonStanding className="h-4 w-4 text-eco-green" />
               </span>
               Walk
             </Label>
@@ -75,7 +76,7 @@ const TransportMethodSelector: React.FC<TransportMethodSelectorProps> = ({
             <RadioGroupItem value="wheelchair" id="wheelchair" />
             <Label htmlFor="wheelchair" className="flex items-center gap-2 cursor-pointer">
               <span className="bg-eco-green/10 p-1.5 rounded-full">
-                <Wheelchair className="h-4 w-4 text-eco-green" />
+                <ElectricWheelchair className="h-4 w-4 text-eco-green" />
               </span>
               Wheelchair
             </Label>
