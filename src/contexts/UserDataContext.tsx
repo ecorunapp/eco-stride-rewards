@@ -2,12 +2,22 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { calculateEcoCoins, loadFromStorage, saveToStorage, setupDailyReset } from "@/lib/utils";
 
+// Define a type for completed tasks
+interface CompletedTask {
+  id: number;
+  title: string;
+  reward: number;
+  date: string;
+}
+
 interface UserDataContextType {
   steps: number;
   coins: number;
   totalCoins: number;
+  completedTasks: CompletedTask[];
   incrementSteps: (amount: number) => void;
   resetDailySteps: () => void;
+  addCompletedTask: (task: CompletedTask) => void;
 }
 
 const UserDataContext = createContext<UserDataContextType | undefined>(undefined);
@@ -23,6 +33,10 @@ export const UserDataProvider = ({ children }: { children: ReactNode }) => {
   
   const [totalCoins, setTotalCoins] = useState<number>(() => 
     loadFromStorage("ecorun_total_coins", 0)
+  );
+  
+  const [completedTasks, setCompletedTasks] = useState<CompletedTask[]>(() =>
+    loadFromStorage("ecorun_completed_tasks", [])
   );
   
   // Simulate step counting with increment function
@@ -52,6 +66,26 @@ export const UserDataProvider = ({ children }: { children: ReactNode }) => {
     });
   };
   
+  // Add a completed task and update total coins
+  const addCompletedTask = (task: CompletedTask) => {
+    // Check if task already exists to prevent duplicates
+    const taskExists = completedTasks.some(t => t.id === task.id);
+    
+    if (!taskExists) {
+      // Add task to completed tasks
+      const updatedTasks = [...completedTasks, task];
+      setCompletedTasks(updatedTasks);
+      saveToStorage("ecorun_completed_tasks", updatedTasks);
+      
+      // Update total coins
+      setTotalCoins(prevTotal => {
+        const newTotal = prevTotal + task.reward;
+        saveToStorage("ecorun_total_coins", newTotal);
+        return newTotal;
+      });
+    }
+  };
+  
   // Reset daily step count and coins
   const resetDailySteps = () => {
     setSteps(0);
@@ -78,9 +112,11 @@ export const UserDataProvider = ({ children }: { children: ReactNode }) => {
       value={{ 
         steps, 
         coins, 
-        totalCoins, 
+        totalCoins,
+        completedTasks, 
         incrementSteps, 
-        resetDailySteps 
+        resetDailySteps,
+        addCompletedTask 
       }}
     >
       {children}
@@ -95,3 +131,4 @@ export const useUserData = () => {
   }
   return context;
 };
+

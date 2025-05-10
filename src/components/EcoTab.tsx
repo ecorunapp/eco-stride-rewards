@@ -1,8 +1,10 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { cn, formatNumber } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
-import { Coins } from "lucide-react";
+import { Coins, ChevronDown, ChevronUp, Package, Award } from "lucide-react";
+import { useUserData } from "@/contexts/UserDataContext";
+import { Button } from "@/components/ui/button";
 
 interface EcoTabProps {
   coinBalance: number;
@@ -10,6 +12,9 @@ interface EcoTabProps {
 }
 
 const EcoTab = ({ coinBalance, className }: EcoTabProps) => {
+  const { completedTasks } = useUserData();
+  const [showTasks, setShowTasks] = useState(false);
+  
   return (
     <Card className={cn("overflow-hidden shadow-lg", className)}>
       <div className="eco-card p-6 text-white">
@@ -35,12 +40,55 @@ const EcoTab = ({ coinBalance, className }: EcoTabProps) => {
         </div>
       </div>
       <CardContent className="p-4 bg-background">
-        <div className="text-xs text-center text-muted-foreground">
-          Tap to view rewards and partner discounts
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">
+            {completedTasks.length} completed tasks
+          </span>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-8 w-8 p-0"
+            onClick={() => setShowTasks(!showTasks)}
+          >
+            {showTasks ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </Button>
         </div>
+        
+        {showTasks && completedTasks.length > 0 && (
+          <div className="mt-3 space-y-2 max-h-40 overflow-y-auto">
+            {completedTasks.map((task) => (
+              <div 
+                key={task.id}
+                className="text-xs p-2 border border-border rounded-md flex justify-between items-center"
+              >
+                <div className="flex items-center gap-2">
+                  <div className="bg-eco-green/10 p-1.5 rounded-full">
+                    <Package className="h-3 w-3 text-eco-green" />
+                  </div>
+                  <div>
+                    <p className="font-medium">{task.title}</p>
+                    <p className="text-muted-foreground">{task.date}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 text-primary">
+                  <Award className="h-3 w-3" />
+                  <span>{task.reward}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        
+        {showTasks && completedTasks.length === 0 && (
+          <div className="mt-3 text-center py-4 text-xs text-muted-foreground">
+            No completed tasks yet.
+            <p>Complete EcoDrop+ tasks to earn rewards!</p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
 };
 
 export default EcoTab;
+

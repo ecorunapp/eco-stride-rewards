@@ -1,14 +1,35 @@
 
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Package, MapPin, Clock, Award, ChevronRight, Filter } from "lucide-react";
+import { Package, MapPin, Clock, Award, ChevronRight, Filter, Calendar, User, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { useUserData } from "@/contexts/UserDataContext";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 
-const TaskCard = ({ title, location, timeEstimate, reward, distance }) => (
-  <Card className="w-full mb-3 hover:shadow-md transition-shadow duration-300 cursor-pointer border-border bg-background/80 backdrop-blur-sm">
+// Task type definition
+interface Task {
+  id: number;
+  title: string;
+  location: string;
+  distance: string;
+  timeEstimate: string;
+  reward: string;
+  rewardPoints: number;
+  postedBy?: string;
+  status?: "available" | "active" | "completed";
+  description?: string;
+  date?: string;
+}
+
+const TaskCard = ({ task, onClick }: { task: Task; onClick: () => void }) => (
+  <Card 
+    className="w-full mb-3 hover:shadow-md transition-shadow duration-300 cursor-pointer border-border bg-background/80 backdrop-blur-sm"
+    onClick={onClick}
+  >
     <CardContent className="p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -16,12 +37,12 @@ const TaskCard = ({ title, location, timeEstimate, reward, distance }) => (
             <Package className="h-5 w-5 text-eco-green" />
           </div>
           <div>
-            <h3 className="font-semibold text-base">{title}</h3>
+            <h3 className="font-semibold text-base">{task.title}</h3>
             <div className="flex items-center gap-2 text-muted-foreground text-xs mt-1">
               <MapPin className="h-3 w-3" />
-              <span>{location}</span>
+              <span>{task.location}</span>
               <span className="inline-block h-1 w-1 rounded-full bg-muted-foreground"></span>
-              <span>{distance}</span>
+              <span>{task.distance}</span>
             </div>
           </div>
         </div>
@@ -33,11 +54,11 @@ const TaskCard = ({ title, location, timeEstimate, reward, distance }) => (
       <div className="flex items-center justify-between text-sm">
         <div className="flex items-center gap-1 text-muted-foreground">
           <Clock className="h-3.5 w-3.5" />
-          <span>{timeEstimate}</span>
+          <span>{task.timeEstimate}</span>
         </div>
         <div className="flex items-center gap-1 text-primary font-medium">
           <Award className="h-3.5 w-3.5" />
-          <span>{reward}</span>
+          <span>{task.reward}</span>
         </div>
       </div>
     </CardContent>
@@ -46,64 +67,161 @@ const TaskCard = ({ title, location, timeEstimate, reward, distance }) => (
 
 const EcoDropPage = () => {
   const [activeTab, setActiveTab] = useState("available");
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
+  const [isNearbyTasksOpen, setIsNearbyTasksOpen] = useState(false);
+  const { addCompletedTask } = useUserData();
 
   // Mock task data
-  const availableTasks = [
+  const availableTasks: Task[] = [
     {
       id: 1,
       title: "Deliver eco-friendly package",
-      location: "Green Market",
+      location: "Green Market, UAE",
       distance: "1.2 km",
       timeEstimate: "15-20 min",
-      reward: "50 ecoCoins"
+      reward: "50 ecoCoins",
+      rewardPoints: 50,
+      postedBy: "EcoStore Dubai",
+      description: "Pick up an organic food package from Green Market and deliver it to a customer nearby. Package contains perishable items, so prompt delivery is essential.",
+      date: "May 10, 2025"
     },
     {
       id: 2,
       title: "Pickup recycled materials",
-      location: "Community Center",
+      location: "Community Center, UAE",
       distance: "0.8 km",
       timeEstimate: "10-15 min",
-      reward: "35 ecoCoins"
+      reward: "35 ecoCoins",
+      rewardPoints: 35,
+      postedBy: "UAE Recycles",
+      description: "Collect sorted recyclable materials from the Community Center and transport them to the recycling facility. Materials include paper, plastics, and glass.",
+      date: "May 10, 2025"
     },
     {
       id: 3,
       title: "Distribute flyers for tree planting",
-      location: "City Park",
+      location: "City Park, UAE",
       distance: "2.1 km",
       timeEstimate: "25-30 min",
-      reward: "60 ecoCoins"
+      reward: "60 ecoCoins",
+      rewardPoints: 60,
+      postedBy: "Green UAE Initiative",
+      description: "Hand out information flyers about the upcoming tree planting event at City Park. Target local businesses and residents in the surrounding area.",
+      date: "May 10, 2025"
     }
   ];
 
-  const activeTasks = [
+  const activeTasks: Task[] = [
     {
       id: 4,
       title: "Collect compostable waste",
-      location: "Local Farm",
+      location: "Local Farm, UAE",
       distance: "1.5 km",
       timeEstimate: "15 min left",
-      reward: "45 ecoCoins"
+      reward: "45 ecoCoins",
+      rewardPoints: 45,
+      postedBy: "Organic Farms UAE",
+      status: "active",
+      description: "Collect food waste from local restaurants to be used as compost at Organic Farms. The compost will be used to grow organic vegetables.",
+      date: "May 10, 2025"
     }
   ];
 
-  const completedTasks = [
+  const completedTasks: Task[] = [
     {
       id: 5,
       title: "Delivered organic groceries",
-      location: "Riverside Apartments",
+      location: "Riverside Apartments, UAE",
       distance: "1.7 km",
       timeEstimate: "Completed",
-      reward: "55 ecoCoins (earned)"
+      reward: "55 ecoCoins (earned)",
+      rewardPoints: 55,
+      postedBy: "Organic Grocer UAE",
+      status: "completed",
+      description: "Successfully delivered fresh organic produce to customers at Riverside Apartments. All items were delivered in eco-friendly packaging.",
+      date: "May 9, 2025"
     },
     {
       id: 6,
       title: "Collected recyclable electronics",
-      location: "Tech Recycling Center",
+      location: "Tech Recycling Center, UAE",
       distance: "3.2 km",
       timeEstimate: "Completed",
-      reward: "80 ecoCoins (earned)"
+      reward: "80 ecoCoins (earned)",
+      rewardPoints: 80,
+      postedBy: "E-Waste UAE",
+      status: "completed",
+      description: "Collected old electronics from residential areas and delivered them to the Tech Recycling Center for proper disposal and recycling.",
+      date: "May 8, 2025"
     }
   ];
+
+  // Nearby tasks (for the "Find Tasks Near Me" sheet)
+  const nearbyTasks: Task[] = [
+    {
+      id: 7,
+      title: "Eco-friendly delivery",
+      location: "Marina Mall, UAE",
+      distance: "0.3 km",
+      timeEstimate: "5-10 min",
+      reward: "25 ecoCoins",
+      rewardPoints: 25,
+      postedBy: "Green Deliveries UAE",
+      description: "Deliver a small eco-friendly package from Marina Mall to a nearby office building. The package contains sustainable office supplies.",
+      date: "May 10, 2025"
+    },
+    {
+      id: 8,
+      title: "Beach cleanup volunteer",
+      location: "Jumeirah Beach, UAE",
+      distance: "0.5 km",
+      timeEstimate: "30-45 min",
+      reward: "70 ecoCoins",
+      rewardPoints: 70,
+      postedBy: "Clean Beaches UAE",
+      description: "Join a beach cleanup effort at Jumeirah Beach. Equipment provided. Help collect plastic waste and other debris to keep our beaches clean.",
+      date: "May 10, 2025"
+    },
+    {
+      id: 9,
+      title: "Water bottle refill station setup",
+      location: "Downtown Area, UAE",
+      distance: "0.7 km",
+      timeEstimate: "15-20 min",
+      reward: "40 ecoCoins",
+      rewardPoints: 40,
+      postedBy: "Hydrate UAE",
+      description: "Help set up a temporary water bottle refill station in the downtown area to promote reusable water bottles and reduce plastic waste.",
+      date: "May 10, 2025"
+    }
+  ];
+
+  const handleTaskClick = (task: Task) => {
+    setSelectedTask(task);
+    setIsTaskDialogOpen(true);
+  };
+
+  const handleClaimTask = () => {
+    if (selectedTask) {
+      // In a real app, this would involve API calls and state updates
+      setIsTaskDialogOpen(false);
+      // For demo purposes, we'll just show a completed status
+      if (selectedTask.status === "completed") {
+        // If the task is already completed, add it to completed tasks list in UserDataContext
+        addCompletedTask({
+          id: selectedTask.id,
+          title: selectedTask.title,
+          reward: selectedTask.rewardPoints,
+          date: selectedTask.date || new Date().toLocaleDateString()
+        });
+      }
+    }
+  };
+
+  const handleFindTasksNearMe = () => {
+    setIsNearbyTasksOpen(true);
+  };
 
   return (
     <div className="container max-w-md mx-auto px-4 py-6">
@@ -151,14 +269,14 @@ const EcoDropPage = () => {
             
             <TabsContent value="available" className="space-y-1 mt-0 max-h-[60vh] overflow-y-auto pb-2">
               {availableTasks.map(task => (
-                <TaskCard key={task.id} {...task} />
+                <TaskCard key={task.id} task={task} onClick={() => handleTaskClick(task)} />
               ))}
             </TabsContent>
             
             <TabsContent value="active" className="space-y-1 mt-0 max-h-[60vh] overflow-y-auto pb-2">
               {activeTasks.length > 0 ? (
                 activeTasks.map(task => (
-                  <TaskCard key={task.id} {...task} />
+                  <TaskCard key={task.id} task={task} onClick={() => handleTaskClick(task)} />
                 ))
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
@@ -170,7 +288,7 @@ const EcoDropPage = () => {
             
             <TabsContent value="completed" className="space-y-1 mt-0 max-h-[60vh] overflow-y-auto pb-2">
               {completedTasks.map(task => (
-                <TaskCard key={task.id} {...task} />
+                <TaskCard key={task.id} task={task} onClick={() => handleTaskClick(task)} />
               ))}
             </TabsContent>
           </Tabs>
@@ -178,12 +296,107 @@ const EcoDropPage = () => {
       </Card>
       
       <div className="flex justify-center">
-        <Button className="w-full max-w-xs" size="lg">
+        <Button 
+          className="w-full max-w-xs" 
+          size="lg"
+          onClick={handleFindTasksNearMe}
+        >
           Find Tasks Near Me
         </Button>
       </div>
+
+      {/* Task Details Dialog */}
+      <Dialog open={isTaskDialogOpen} onOpenChange={setIsTaskDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{selectedTask?.title}</DialogTitle>
+            <DialogDescription>
+              Task details and information
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedTask && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 text-sm">
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+                <span>{selectedTask.location}</span>
+                <span className="text-xs text-muted-foreground">({selectedTask.distance})</span>
+              </div>
+              
+              <div className="flex items-center gap-2 text-sm">
+                <Clock className="h-4 w-4 text-muted-foreground" />
+                <span>{selectedTask.timeEstimate}</span>
+              </div>
+              
+              <div className="flex items-center gap-2 text-sm">
+                <User className="h-4 w-4 text-muted-foreground" />
+                <span>Posted by: {selectedTask.postedBy}</span>
+              </div>
+              
+              <div className="flex items-center gap-2 text-sm">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <span>{selectedTask.date}</span>
+              </div>
+              
+              <div className="bg-muted p-3 rounded-md mt-2 text-sm">
+                <p>{selectedTask.description}</p>
+              </div>
+              
+              <div className="flex items-center justify-between mt-4">
+                <div className="flex items-center gap-1 text-primary font-medium">
+                  <Award className="h-5 w-5" />
+                  <span>{selectedTask.reward}</span>
+                </div>
+                
+                <Button 
+                  onClick={handleClaimTask}
+                  className={selectedTask.status === "completed" ? "bg-green-600 hover:bg-green-700" : ""}
+                >
+                  {selectedTask.status === "completed" ? (
+                    <>
+                      <Check className="mr-1 h-4 w-4" />
+                      Completed
+                    </>
+                  ) : selectedTask.status === "active" ? (
+                    "Mark as Complete"
+                  ) : (
+                    "Accept Task"
+                  )}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Nearby Tasks Sheet */}
+      <Sheet open={isNearbyTasksOpen} onOpenChange={setIsNearbyTasksOpen}>
+        <SheetContent side="bottom" className="h-[80vh] rounded-t-xl">
+          <SheetHeader className="text-left pb-2">
+            <SheetTitle>Tasks Near You</SheetTitle>
+            <SheetDescription>
+              Based on your current location in UAE
+            </SheetDescription>
+          </SheetHeader>
+          
+          <div className="mt-4 pb-14 overflow-y-auto">
+            {nearbyTasks.map(task => (
+              <TaskCard 
+                key={task.id} 
+                task={task} 
+                onClick={() => {
+                  setSelectedTask(task);
+                  setIsNearbyTasksOpen(false);
+                  setIsTaskDialogOpen(true);
+                }} 
+              />
+            ))}
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
 
 export default EcoDropPage;
+
