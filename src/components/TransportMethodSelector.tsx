@@ -3,7 +3,7 @@ import React from "react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Bike, Car, PersonStanding, Move } from "lucide-react";
+import { Bike, Car, PersonStanding, Move, Play } from "lucide-react";
 import ElectricWheelchair from "@/components/icons/ElectricWheelchair";
 
 export type TransportMethod = 
@@ -119,15 +119,35 @@ const TransportMethodSelector: React.FC<TransportMethodSelectorProps> = ({
         </div>
       </RadioGroup>
 
+      {selectedMethod && (
+        <div className="mt-4 p-3 border border-eco-green/30 bg-eco-green/5 rounded-md">
+          <div className="flex items-center gap-2 mb-2">
+            <Play className="h-4 w-4 text-eco-green" />
+            <span className="font-medium">Ready to start</span>
+          </div>
+          <p className="text-sm text-muted-foreground mb-2">
+            You've selected {selectedMethod.replace('_', ' ')} for this task.
+          </p>
+          <Button 
+            onClick={handleConfirm}
+            className="w-full bg-eco-green hover:bg-eco-green/90 mt-2"
+          >
+            Start Task
+          </Button>
+        </div>
+      )}
+
       <div className="mt-6 flex justify-end gap-3">
         <Button variant="outline" onClick={onCancel}>Cancel</Button>
-        <Button 
-          onClick={handleConfirm}
-          disabled={!selectedMethod}
-          className="bg-eco-green hover:bg-eco-green/90"
-        >
-          Confirm
-        </Button>
+        {!selectedMethod && (
+          <Button 
+            onClick={handleConfirm}
+            disabled={!selectedMethod}
+            className="bg-eco-green hover:bg-eco-green/90"
+          >
+            Confirm
+          </Button>
+        )}
       </div>
     </div>
   );
