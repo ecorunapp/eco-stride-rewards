@@ -6,13 +6,17 @@ import StepCounter from "@/components/StepCounter";
 import CoinDisplay from "@/components/CoinDisplay";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Users, Footprints, ArrowUpFromLine, Package } from "lucide-react";
+import { Users, Footprints, ArrowUpFromLine, Package, Leaf } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Home = () => {
   const { steps, coins, incrementSteps } = useUserData();
   const currentDate = useCurrentDate();
   const motivationalMessage = getMotivationalMessage(steps);
+  
+  // Calculate CO2 savings (approx 0.2g per step)
+  const co2Saved = steps * 0.2;
+  const distanceWalked = (steps * 0.0008).toFixed(2);
   
   // Manually add steps (for demo purposes)
   const handleAddSteps = () => {
@@ -45,12 +49,24 @@ const Home = () => {
           </Button>
         </div>
         
-        <div className="w-full p-4 bg-muted rounded-lg mt-4">
-          <h3 className="font-medium mb-2">Daily Progress</h3>
-          <p className="text-sm text-muted-foreground">
-            You've earned {coins} ecoCoins today by taking {steps} steps.
-            That's approximately {(steps * 0.0008).toFixed(2)} km walked!
-          </p>
+        <div className="w-full p-4 bg-muted rounded-lg mt-4 space-y-4">
+          <div>
+            <h3 className="font-medium mb-2">Daily Progress</h3>
+            <p className="text-sm text-muted-foreground">
+              You've earned {coins} ecoCoins today by taking {steps} steps.
+              That's approximately {distanceWalked} km walked!
+            </p>
+          </div>
+          
+          <div className="flex items-center p-3 bg-green-50 rounded-lg">
+            <Leaf className="h-5 w-5 text-green-500 mr-2" />
+            <div>
+              <h4 className="text-sm font-medium text-green-800">Environmental Impact</h4>
+              <p className="text-xs text-green-700">
+                Your steps have saved {co2Saved < 1000 ? `${co2Saved.toFixed(1)} grams` : `${(co2Saved / 1000).toFixed(2)} kg`} of CO₂ emissions today!
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Feature Icons Section */}
