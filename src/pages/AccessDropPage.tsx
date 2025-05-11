@@ -1,7 +1,6 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Wheelchair, MapPin, Clock, Award, ChevronRight, Filter, Calendar, User, Check } from "lucide-react";
+import { Accessibility, MapPin, Clock, Award, ChevronRight, Filter, Calendar, User, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
@@ -38,7 +37,7 @@ const TaskCard = ({ task, onClick }: { task: Task; onClick: () => void }) => (
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="bg-eco-blue/10 p-3 rounded-full">
-            <Wheelchair className="h-5 w-5 text-eco-blue" />
+            <Accessibility className="h-5 w-5 text-eco-blue" />
           </div>
           <div>
             <h3 className="font-semibold text-base">{task.title}</h3>

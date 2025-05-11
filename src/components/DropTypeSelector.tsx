@@ -2,7 +2,7 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Wheelchair, Package } from "lucide-react";
+import { Accessibility, Package } from "lucide-react";
 
 type DropType = "accessdrop" | "ecodrop";
 
@@ -23,7 +23,7 @@ const DropTypeSelector: React.FC<DropTypeSelectorProps> = ({ onSelect }) => {
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="bg-eco-blue/10 p-3 rounded-full">
-                <Wheelchair className="h-6 w-6 text-eco-blue" />
+                <Accessibility className="h-6 w-6 text-eco-blue" />
               </div>
               <div>
                 <h2 className="font-semibold text-lg">AccessDrop</h2>

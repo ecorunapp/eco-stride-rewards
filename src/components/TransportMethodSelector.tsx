@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Bike, Car, PersonStanding, Move, Play, Calendar, CheckCircle } from "lucide-react";
+import { Bike, Car, PersonStanding, Move, Play, Calendar, CheckCircle, Accessibility } from "lucide-react";
 import ElectricWheelchair from "@/components/icons/ElectricWheelchair";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
@@ -158,7 +158,7 @@ const TransportMethodSelector: React.FC<TransportMethodSelectorProps> = ({
               <RadioGroupItem value="wheelchair" id="wheelchair" />
               <Label htmlFor="wheelchair" className="flex items-center gap-2 cursor-pointer">
                 <span className="bg-eco-green/10 p-1.5 rounded-full">
-                  <ElectricWheelchair className="h-4 w-4 text-eco-green" />
+                  <Accessibility className="h-4 w-4 text-eco-green" />
                 </span>
                 Wheelchair
               </Label>
