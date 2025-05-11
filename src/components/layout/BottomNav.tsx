@@ -25,7 +25,7 @@ const BottomNav = () => {
     },
     {
       icon: Package,
-      label: "MoveMate",
+      label: "EcoDrop",
       path: "/ecodrop",
     }
   ];

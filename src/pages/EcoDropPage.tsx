@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, MapPin, Clock, Award, ChevronRight, Filter, Calendar, User, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,6 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "
 import SimpleMap from "@/components/SimpleMap";
 import TransportMethodSelector, { TransportMethod } from "@/components/TransportMethodSelector";
 import { useToast } from "@/hooks/use-toast";
-import DropTypeSelector from "@/components/DropTypeSelector";
 
 // Task type definition
 interface Task {
@@ -75,20 +74,8 @@ const EcoDropPage = () => {
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
   const [isNearbyTasksOpen, setIsNearbyTasksOpen] = useState(false);
   const [showMethodSelector, setShowMethodSelector] = useState(false);
-  const [showTypeSelector, setShowTypeSelector] = useState(true);
   const { addCompletedTask } = useUserData();
   const { toast } = useToast();
-  const navigate = useNavigate();
-  const location = useLocation();
-  
-  const handleTypeSelect = (type: "accessdrop" | "ecodrop") => {
-    if (type === "accessdrop") {
-      navigate("/accessdrop", { state: { fromSelection: true } });
-    } else {
-      // Stay on this page but hide the type selector
-      setShowTypeSelector(false);
-    }
-  };
 
   // Mock task data
   const availableTasks: Task[] = [
@@ -265,202 +252,193 @@ const EcoDropPage = () => {
     setIsNearbyTasksOpen(true);
   };
 
-  // If we're waiting for the redirect, return null
-  if (!location.state?.fromSelection) return null;
-
   return (
     <div className="container max-w-md mx-auto px-4 py-6">
-      {showTypeSelector ? (
-        <DropTypeSelector onSelect={handleTypeSelect} />
-      ) : (
-        <>
-          <header className="flex justify-between items-start mb-6">
-            <div>
-              <h1 className="text-2xl font-bold text-primary mb-1">EcoDrop+</h1>
-              <p className="text-sm text-muted-foreground">Complete eco-tasks for rewards</p>
-            </div>
-            <Badge variant="outline" className="flex items-center gap-1 bg-eco-green/10 text-eco-green border-eco-green/20">
-              <Award className="h-3.5 w-3.5" /> 
-              Eco Champion
-            </Badge>
-          </header>
-          
-          <Card className="mb-6 border-border bg-background/80 backdrop-blur-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center justify-between">
-                <span>Task Board</span>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <Filter className="h-4 w-4" />
-                </Button>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 pt-0">
-              <Tabs
-                defaultValue="available" 
-                value={activeTab} 
-                onValueChange={setActiveTab} 
-                className="w-full"
-              >
-                <TabsList className="grid grid-cols-3 mb-4">
-                  <TabsTrigger value="available" className="text-xs">
-                    Available
-                    <Badge variant="secondary" className="ml-1 h-5 bg-muted">{availableTasks.length}</Badge>
-                  </TabsTrigger>
-                  <TabsTrigger value="active" className="text-xs">
-                    Active
-                    <Badge variant="secondary" className="ml-1 h-5 bg-muted">{activeTasks.length}</Badge>
-                  </TabsTrigger>
-                  <TabsTrigger value="completed" className="text-xs">
-                    Completed
-                    <Badge variant="secondary" className="ml-1 h-5 bg-muted">{completedTasks.length}</Badge>
-                  </TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="available" className="space-y-1 mt-0 max-h-[60vh] overflow-y-auto pb-2">
-                  {availableTasks.map(task => (
-                    <TaskCard key={task.id} task={task} onClick={() => handleTaskClick(task)} />
-                  ))}
-                </TabsContent>
-                
-                <TabsContent value="active" className="space-y-1 mt-0 max-h-[60vh] overflow-y-auto pb-2">
-                  {activeTasks.length > 0 ? (
-                    activeTasks.map(task => (
-                      <TaskCard key={task.id} task={task} onClick={() => handleTaskClick(task)} />
-                    ))
-                  ) : (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <p>No active tasks</p>
-                      <p className="text-sm mt-1">Accept a task to get started</p>
-                    </div>
-                  )}
-                </TabsContent>
-                
-                <TabsContent value="completed" className="space-y-1 mt-0 max-h-[60vh] overflow-y-auto pb-2">
-                  {completedTasks.map(task => (
-                    <TaskCard key={task.id} task={task} onClick={() => handleTaskClick(task)} />
-                  ))}
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
-          
-          <div className="flex justify-center">
-            <Button 
-              className="w-full max-w-xs" 
-              size="lg"
-              onClick={handleFindTasksNearMe}
-            >
-              Find Tasks Near Me
+      <header className="flex justify-between items-start mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-primary mb-1">EcoDrop+</h1>
+          <p className="text-sm text-muted-foreground">Complete eco-tasks for rewards</p>
+        </div>
+        <Badge variant="outline" className="flex items-center gap-1 bg-eco-green/10 text-eco-green border-eco-green/20">
+          <Award className="h-3.5 w-3.5" /> 
+          Eco Champion
+        </Badge>
+      </header>
+      
+      <Card className="mb-6 border-border bg-background/80 backdrop-blur-sm">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg flex items-center justify-between">
+            <span>Task Board</span>
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Filter className="h-4 w-4" />
             </Button>
-          </div>
-
-          {/* Task Details Dialog */}
-          <Dialog open={isTaskDialogOpen} onOpenChange={setIsTaskDialogOpen}>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>{selectedTask?.title}</DialogTitle>
-                <DialogDescription>
-                  Task details and information
-                </DialogDescription>
-              </DialogHeader>
-
-              {selectedTask && (
-                <div className="space-y-4">
-                  {/* Show map for the task when task is accepted or being viewed */}
-                  {(showMethodSelector || selectedTask.status === "accepted") && (
-                    <SimpleMap destination={selectedTask.location} />
-                  )}
-                  
-                  <div className="flex items-center gap-2 text-sm">
-                    <MapPin className="h-4 w-4 text-muted-foreground" />
-                    <span>{selectedTask.location}</span>
-                    <span className="text-xs text-muted-foreground">({selectedTask.distance})</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 text-sm">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span>{selectedTask.timeEstimate}</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 text-sm">
-                    <User className="h-4 w-4 text-muted-foreground" />
-                    <span>Posted by: {selectedTask.postedBy}</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 text-sm">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <span>{selectedTask.date}</span>
-                  </div>
-                  
-                  <div className="bg-muted p-3 rounded-md mt-2 text-sm">
-                    <p>{selectedTask.description}</p>
-                  </div>
-                  
-                  {/* Transportation Method Selector */}
-                  {showMethodSelector ? (
-                    <TransportMethodSelector 
-                      onSelect={handleMethodSelect}
-                      onCancel={handleMethodCancel}
-                    />
-                  ) : (
-                    <div className="flex items-center justify-between mt-4">
-                      <div className="flex items-center gap-1 text-primary font-medium">
-                        <Award className="h-5 w-5" />
-                        <span>{selectedTask.reward}</span>
-                      </div>
-                      
-                      <Button 
-                        onClick={handleClaimTask}
-                        className={selectedTask.status === "completed" ? "bg-green-600 hover:bg-green-700" : 
-                                  selectedTask.status === "accepted" ? "bg-eco-blue hover:bg-eco-blue/90" : ""}
-                      >
-                        {selectedTask.status === "completed" ? (
-                          <>
-                            <Check className="mr-1 h-4 w-4" />
-                            Completed
-                          </>
-                        ) : selectedTask.status === "active" ? (
-                          "Mark as Complete"
-                        ) : selectedTask.status === "accepted" ? (
-                          "Start Navigation"
-                        ) : (
-                          "Accept Task"
-                        )}
-                      </Button>
-                    </div>
-                  )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-4 pt-0">
+          <Tabs
+            defaultValue="available" 
+            value={activeTab} 
+            onValueChange={setActiveTab} 
+            className="w-full"
+          >
+            <TabsList className="grid grid-cols-3 mb-4">
+              <TabsTrigger value="available" className="text-xs">
+                Available
+                <Badge variant="secondary" className="ml-1 h-5 bg-muted">{availableTasks.length}</Badge>
+              </TabsTrigger>
+              <TabsTrigger value="active" className="text-xs">
+                Active
+                <Badge variant="secondary" className="ml-1 h-5 bg-muted">{activeTasks.length}</Badge>
+              </TabsTrigger>
+              <TabsTrigger value="completed" className="text-xs">
+                Completed
+                <Badge variant="secondary" className="ml-1 h-5 bg-muted">{completedTasks.length}</Badge>
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="available" className="space-y-1 mt-0 max-h-[60vh] overflow-y-auto pb-2">
+              {availableTasks.map(task => (
+                <TaskCard key={task.id} task={task} onClick={() => handleTaskClick(task)} />
+              ))}
+            </TabsContent>
+            
+            <TabsContent value="active" className="space-y-1 mt-0 max-h-[60vh] overflow-y-auto pb-2">
+              {activeTasks.length > 0 ? (
+                activeTasks.map(task => (
+                  <TaskCard key={task.id} task={task} onClick={() => handleTaskClick(task)} />
+                ))
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>No active tasks</p>
+                  <p className="text-sm mt-1">Accept a task to get started</p>
                 </div>
               )}
-            </DialogContent>
-          </Dialog>
+            </TabsContent>
+            
+            <TabsContent value="completed" className="space-y-1 mt-0 max-h-[60vh] overflow-y-auto pb-2">
+              {completedTasks.map(task => (
+                <TaskCard key={task.id} task={task} onClick={() => handleTaskClick(task)} />
+              ))}
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+      
+      <div className="flex justify-center">
+        <Button 
+          className="w-full max-w-xs" 
+          size="lg"
+          onClick={handleFindTasksNearMe}
+        >
+          Find Tasks Near Me
+        </Button>
+      </div>
 
-          {/* Nearby Tasks Sheet */}
-          <Sheet open={isNearbyTasksOpen} onOpenChange={setIsNearbyTasksOpen}>
-            <SheetContent side="bottom" className="h-[80vh] rounded-t-xl">
-              <SheetHeader className="text-left pb-2">
-                <SheetTitle>Tasks Near You</SheetTitle>
-                <SheetDescription>
-                  Based on your current location in UAE
-                </SheetDescription>
-              </SheetHeader>
+      {/* Task Details Dialog */}
+      <Dialog open={isTaskDialogOpen} onOpenChange={setIsTaskDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{selectedTask?.title}</DialogTitle>
+            <DialogDescription>
+              Task details and information
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedTask && (
+            <div className="space-y-4">
+              {/* Show map for the task when task is accepted or being viewed */}
+              {(showMethodSelector || selectedTask.status === "accepted") && (
+                <SimpleMap destination={selectedTask.location} />
+              )}
               
-              <div className="mt-4 pb-14 overflow-y-auto">
-                {nearbyTasks.map(task => (
-                  <TaskCard 
-                    key={task.id} 
-                    task={task} 
-                    onClick={() => {
-                      setSelectedTask(task);
-                      setIsNearbyTasksOpen(false);
-                      setIsTaskDialogOpen(true);
-                    }} 
-                  />
-                ))}
+              <div className="flex items-center gap-2 text-sm">
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+                <span>{selectedTask.location}</span>
+                <span className="text-xs text-muted-foreground">({selectedTask.distance})</span>
               </div>
-            </SheetContent>
-          </Sheet>
-        </>
-      )}
+              
+              <div className="flex items-center gap-2 text-sm">
+                <Clock className="h-4 w-4 text-muted-foreground" />
+                <span>{selectedTask.timeEstimate}</span>
+              </div>
+              
+              <div className="flex items-center gap-2 text-sm">
+                <User className="h-4 w-4 text-muted-foreground" />
+                <span>Posted by: {selectedTask.postedBy}</span>
+              </div>
+              
+              <div className="flex items-center gap-2 text-sm">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <span>{selectedTask.date}</span>
+              </div>
+              
+              <div className="bg-muted p-3 rounded-md mt-2 text-sm">
+                <p>{selectedTask.description}</p>
+              </div>
+              
+              {/* Transportation Method Selector */}
+              {showMethodSelector ? (
+                <TransportMethodSelector 
+                  onSelect={handleMethodSelect}
+                  onCancel={handleMethodCancel}
+                />
+              ) : (
+                <div className="flex items-center justify-between mt-4">
+                  <div className="flex items-center gap-1 text-primary font-medium">
+                    <Award className="h-5 w-5" />
+                    <span>{selectedTask.reward}</span>
+                  </div>
+                  
+                  <Button 
+                    onClick={handleClaimTask}
+                    className={selectedTask.status === "completed" ? "bg-green-600 hover:bg-green-700" : 
+                              selectedTask.status === "accepted" ? "bg-eco-blue hover:bg-eco-blue/90" : ""}
+                  >
+                    {selectedTask.status === "completed" ? (
+                      <>
+                        <Check className="mr-1 h-4 w-4" />
+                        Completed
+                      </>
+                    ) : selectedTask.status === "active" ? (
+                      "Mark as Complete"
+                    ) : selectedTask.status === "accepted" ? (
+                      "Start Navigation"
+                    ) : (
+                      "Accept Task"
+                    )}
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Nearby Tasks Sheet */}
+      <Sheet open={isNearbyTasksOpen} onOpenChange={setIsNearbyTasksOpen}>
+        <SheetContent side="bottom" className="h-[80vh] rounded-t-xl">
+          <SheetHeader className="text-left pb-2">
+            <SheetTitle>Tasks Near You</SheetTitle>
+            <SheetDescription>
+              Based on your current location in UAE
+            </SheetDescription>
+          </SheetHeader>
+          
+          <div className="mt-4 pb-14 overflow-y-auto">
+            {nearbyTasks.map(task => (
+              <TaskCard 
+                key={task.id} 
+                task={task} 
+                onClick={() => {
+                  setSelectedTask(task);
+                  setIsNearbyTasksOpen(false);
+                  setIsTaskDialogOpen(true);
+                }} 
+              />
+            ))}
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
