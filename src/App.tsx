@@ -15,7 +15,7 @@ import MeetFlarePage from "@/pages/MeetFlarePage";
 import RunfluencePage from "@/pages/RunfluencePage";
 import MoveMatePage from "@/pages/MoveMatePage";
 import NotFound from "@/pages/NotFound";
-import DropTypeSelector from "@/components/DropTypeSelector";
+import DropSelectPage from "@/pages/DropSelectPage";
 
 const queryClient = new QueryClient();
 
