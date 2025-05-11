@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Package, MapPin, Clock, Award, ChevronRight, Filter, Calendar, User, Check } from "lucide-react";
+import { Package, Accessibility, MapPin, Clock, Award, ChevronRight, Filter, Calendar, User, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
@@ -12,9 +12,6 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "
 import SimpleMap from "@/components/SimpleMap";
 import TransportMethodSelector, { TransportMethod } from "@/components/TransportMethodSelector";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
-import DropTypeSelector from "@/components/DropTypeSelector";
-import RentalDetailsPopup from "@/components/RentalDetailsPopup";
 
 // Task type definition
 interface Task {
@@ -29,6 +26,7 @@ interface Task {
   status?: "available" | "active" | "completed" | "accepted";
   description?: string;
   date?: string;
+  accessFriendly: boolean;
 }
 
 const TaskCard = ({ task, onClick }: { task: Task; onClick: () => void }) => (
@@ -39,11 +37,22 @@ const TaskCard = ({ task, onClick }: { task: Task; onClick: () => void }) => (
     <CardContent className="p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="bg-eco-green/10 p-3 rounded-full">
-            <Package className="h-5 w-5 text-eco-green" />
+          <div className={`${task.accessFriendly ? "bg-eco-blue/10" : "bg-eco-green/10"} p-3 rounded-full`}>
+            {task.accessFriendly ? (
+              <Accessibility className="h-5 w-5 text-eco-blue" />
+            ) : (
+              <Package className="h-5 w-5 text-eco-green" />
+            )}
           </div>
           <div>
-            <h3 className="font-semibold text-base">{task.title}</h3>
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold text-base">{task.title}</h3>
+              {task.accessFriendly && (
+                <Badge variant="outline" className="bg-eco-blue/10 text-eco-blue border-eco-blue/20 text-xs">
+                  Accessible
+                </Badge>
+              )}
+            </div>
             <div className="flex items-center gap-2 text-muted-foreground text-xs mt-1">
               <MapPin className="h-3 w-3" />
               <span>{task.location}</span>
@@ -71,101 +80,89 @@ const TaskCard = ({ task, onClick }: { task: Task; onClick: () => void }) => (
   </Card>
 );
 
-const EcoDropPage = () => {
+const AccessDropPage = () => {
   const [activeTab, setActiveTab] = useState("available");
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
   const [isNearbyTasksOpen, setIsNearbyTasksOpen] = useState(false);
   const [showMethodSelector, setShowMethodSelector] = useState(false);
-  const [showDropTypeSelector, setShowDropTypeSelector] = useState(true);
-  const [selectedVehicleType, setSelectedVehicleType] = useState<string | null>(null);
-  const [showRentalPopup, setShowRentalPopup] = useState(false);
   const { addCompletedTask } = useUserData();
   const { toast } = useToast();
-  const navigate = useNavigate();
 
-  // Mock task data
+  // Mock task data with accessible tasks
   const availableTasks: Task[] = [
     {
       id: 1,
-      title: "Deliver eco-friendly package",
-      location: "Green Market, UAE",
-      distance: "1.2 km",
-      timeEstimate: "15-20 min",
-      reward: "50 ecoCoins",
-      rewardPoints: 50,
-      postedBy: "EcoStore Dubai",
-      description: "Pick up an organic food package from Green Market and deliver it to a customer nearby. Package contains perishable items, so prompt delivery is essential.",
-      date: "May 10, 2025"
+      title: "Deliver documents to office",
+      location: "Business Center, UAE",
+      distance: "0.9 km",
+      timeEstimate: "10-15 min",
+      reward: "40 ecoCoins",
+      rewardPoints: 40,
+      postedBy: "AccessDrop UAE",
+      description: "Deliver important documents to the accessible business center. All routes are wheelchair-friendly with ramps and elevators available.",
+      date: "May 10, 2025",
+      accessFriendly: true
     },
     {
       id: 2,
-      title: "Pickup recycled materials",
-      location: "Community Center, UAE",
-      distance: "0.8 km",
-      timeEstimate: "10-15 min",
-      reward: "35 ecoCoins",
-      rewardPoints: 35,
-      postedBy: "UAE Recycles",
-      description: "Collect sorted recyclable materials from the Community Center and transport them to the recycling facility. Materials include paper, plastics, and glass.",
-      date: "May 10, 2025"
+      title: "Deliver medical supplies",
+      location: "Community Hospital, UAE",
+      distance: "1.2 km",
+      timeEstimate: "15-20 min",
+      reward: "55 ecoCoins",
+      rewardPoints: 55,
+      postedBy: "Health Access UAE",
+      description: "Transport non-urgent medical supplies to the hospital. Accessible route provided with priority access at the delivery entrance.",
+      date: "May 10, 2025",
+      accessFriendly: true
     },
     {
       id: 3,
-      title: "Distribute flyers for tree planting",
-      location: "City Park, UAE",
-      distance: "2.1 km",
-      timeEstimate: "25-30 min",
-      reward: "60 ecoCoins",
-      rewardPoints: 60,
-      postedBy: "Green UAE Initiative",
-      description: "Hand out information flyers about the upcoming tree planting event at City Park. Target local businesses and residents in the surrounding area.",
-      date: "May 10, 2025"
+      title: "Pharmacy pickup service",
+      location: "MediCare Pharmacy, UAE",
+      distance: "0.6 km",
+      timeEstimate: "8-10 min",
+      reward: "30 ecoCoins",
+      rewardPoints: 30,
+      postedBy: "AccessHealth UAE",
+      description: "Collect prescription medications from MediCare Pharmacy and deliver to a nearby residential building. All locations have wheelchair ramps.",
+      date: "May 10, 2025",
+      accessFriendly: true
     }
   ];
 
   const activeTasks: Task[] = [
     {
       id: 4,
-      title: "Collect compostable waste",
-      location: "Local Farm, UAE",
-      distance: "1.5 km",
-      timeEstimate: "15 min left",
+      title: "Deliver accessibility survey",
+      location: "City Hall, UAE",
+      distance: "0.7 km",
+      timeEstimate: "10 min left",
       reward: "45 ecoCoins",
       rewardPoints: 45,
-      postedBy: "Organic Farms UAE",
+      postedBy: "Accessibility Commission",
       status: "active",
-      description: "Collect food waste from local restaurants to be used as compost at Organic Farms. The compost will be used to grow organic vegetables.",
-      date: "May 10, 2025"
+      description: "Deliver accessibility survey forms to City Hall. The route has been verified for wheelchair accessibility with no obstacles.",
+      date: "May 10, 2025",
+      accessFriendly: true
     }
   ];
 
   const completedTasks: Task[] = [
     {
       id: 5,
-      title: "Delivered organic groceries",
-      location: "Riverside Apartments, UAE",
-      distance: "1.7 km",
+      title: "Delivered information packages",
+      location: "Community Center, UAE",
+      distance: "0.8 km",
       timeEstimate: "Completed",
-      reward: "55 ecoCoins (earned)",
-      rewardPoints: 55,
-      postedBy: "Organic Grocer UAE",
+      reward: "35 ecoCoins (earned)",
+      rewardPoints: 35,
+      postedBy: "AccessDrop UAE",
       status: "completed",
-      description: "Successfully delivered fresh organic produce to customers at Riverside Apartments. All items were delivered in eco-friendly packaging.",
-      date: "May 9, 2025"
-    },
-    {
-      id: 6,
-      title: "Collected recyclable electronics",
-      location: "Tech Recycling Center, UAE",
-      distance: "3.2 km",
-      timeEstimate: "Completed",
-      reward: "80 ecoCoins (earned)",
-      rewardPoints: 80,
-      postedBy: "E-Waste UAE",
-      status: "completed",
-      description: "Collected old electronics from residential areas and delivered them to the Tech Recycling Center for proper disposal and recycling.",
-      date: "May 8, 2025"
+      description: "Successfully delivered accessibility information packages to the Community Center via the wheelchair-accessible route.",
+      date: "May 9, 2025",
+      accessFriendly: true
     }
   ];
 
@@ -173,49 +170,31 @@ const EcoDropPage = () => {
   const nearbyTasks: Task[] = [
     {
       id: 7,
-      title: "Eco-friendly delivery",
-      location: "Marina Mall, UAE",
-      distance: "0.3 km",
+      title: "Accessible document delivery",
+      location: "North Tower, UAE",
+      distance: "0.4 km",
       timeEstimate: "5-10 min",
       reward: "25 ecoCoins",
       rewardPoints: 25,
-      postedBy: "Green Deliveries UAE",
-      description: "Deliver a small eco-friendly package from Marina Mall to a nearby office building. The package contains sustainable office supplies.",
-      date: "May 10, 2025"
+      postedBy: "AccessDrop UAE",
+      description: "Deliver a small package from the North Tower lobby to an office on the 3rd floor. Elevator access available.",
+      date: "May 10, 2025",
+      accessFriendly: true
     },
     {
       id: 8,
-      title: "Beach cleanup volunteer",
-      location: "Jumeirah Beach, UAE",
-      distance: "0.5 km",
-      timeEstimate: "30-45 min",
-      reward: "70 ecoCoins",
-      rewardPoints: 70,
-      postedBy: "Clean Beaches UAE",
-      description: "Join a beach cleanup effort at Jumeirah Beach. Equipment provided. Help collect plastic waste and other debris to keep our beaches clean.",
-      date: "May 10, 2025"
-    },
-    {
-      id: 9,
-      title: "Water bottle refill station setup",
-      location: "Downtown Area, UAE",
-      distance: "0.7 km",
-      timeEstimate: "15-20 min",
-      reward: "40 ecoCoins",
-      rewardPoints: 40,
-      postedBy: "Hydrate UAE",
-      description: "Help set up a temporary water bottle refill station in the downtown area to promote reusable water bottles and reduce plastic waste.",
-      date: "May 10, 2025"
+      title: "Accessibility survey distribution",
+      location: "Central Mall, UAE",
+      distance: "0.6 km",
+      timeEstimate: "10-15 min",
+      reward: "35 ecoCoins",
+      rewardPoints: 35,
+      postedBy: "Access Research UAE",
+      description: "Distribute accessibility survey forms at the Central Mall. All entrances have ramps and automatic doors.",
+      date: "May 10, 2025",
+      accessFriendly: true
     }
   ];
-
-  const handleDropTypeSelect = (type: "ecodrop" | "accessdrop") => {
-    if (type === "accessdrop") {
-      navigate("/accessdrop");
-    } else {
-      setShowDropTypeSelector(false);
-    }
-  };
 
   const handleTaskClick = (task: Task) => {
     setSelectedTask(task);
@@ -241,19 +220,7 @@ const EcoDropPage = () => {
   };
 
   const handleMethodSelect = (method: TransportMethod) => {
-    // Check if method is a MoveMate+ rental option that needs rental details
-    if (
-      method === "ev_scooter" || 
-      method === "ev_vehicles" || 
-      method === "electric_wheelchair"
-    ) {
-      setSelectedVehicleType(method);
-      setShowRentalPopup(true);
-      setShowMethodSelector(false);
-      return;
-    }
-    
-    // For non-rental methods, accept the task immediately
+    // Update the task status to accepted
     if (selectedTask) {
       setSelectedTask({
         ...selectedTask,
@@ -279,50 +246,23 @@ const EcoDropPage = () => {
     setIsNearbyTasksOpen(true);
   };
 
-  const handleRentalConfirm = () => {
-    // Process the rental confirmation
-    if (selectedTask) {
-      setSelectedTask({
-        ...selectedTask,
-        status: "accepted"
-      });
-      
-      toast({
-        title: "Rental confirmed!",
-        description: `Your ${selectedVehicleType?.replace('_', ' ')} will be ready for your task.`,
-        duration: 5000,
-      });
-      
-      setShowRentalPopup(false);
-    }
-  };
-
-  // Show DropTypeSelector if in selection mode
-  if (showDropTypeSelector) {
-    return (
-      <div className="container max-w-md mx-auto px-4 py-8">
-        <DropTypeSelector onSelect={handleDropTypeSelect} />
-      </div>
-    );
-  }
-
   return (
     <div className="container max-w-md mx-auto px-4 py-6">
       <header className="flex justify-between items-start mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-primary mb-1">EcoDrop+</h1>
-          <p className="text-sm text-muted-foreground">Complete eco-tasks for rewards</p>
+          <h1 className="text-2xl font-bold text-eco-blue mb-1">AccessDrop</h1>
+          <p className="text-sm text-muted-foreground">Wheelchair-accessible eco-tasks</p>
         </div>
-        <Badge variant="outline" className="flex items-center gap-1 bg-eco-green/10 text-eco-green border-eco-green/20">
+        <Badge variant="outline" className="flex items-center gap-1 bg-eco-blue/10 text-eco-blue border-eco-blue/20">
           <Award className="h-3.5 w-3.5" /> 
-          Eco Champion
+          Accessibility Advocate
         </Badge>
       </header>
       
       <Card className="mb-6 border-border bg-background/80 backdrop-blur-sm">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg flex items-center justify-between">
-            <span>Task Board</span>
+            <span>Accessible Tasks</span>
             <Button variant="ghost" size="icon" className="h-8 w-8">
               <Filter className="h-4 w-4" />
             </Button>
@@ -378,21 +318,13 @@ const EcoDropPage = () => {
         </CardContent>
       </Card>
       
-      <div className="flex justify-center space-x-2">
+      <div className="flex justify-center">
         <Button 
-          className="w-full max-w-xs" 
+          className="w-full max-w-xs bg-eco-blue hover:bg-eco-blue/90" 
           size="lg"
           onClick={handleFindTasksNearMe}
         >
-          Find Tasks Near Me
-        </Button>
-        
-        <Button 
-          className="bg-eco-blue hover:bg-eco-blue/90" 
-          variant="outline"
-          onClick={() => setShowDropTypeSelector(true)}
-        >
-          Switch Type
+          Find Accessible Tasks Near Me
         </Button>
       </div>
 
@@ -433,6 +365,12 @@ const EcoDropPage = () => {
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <span>{selectedTask.date}</span>
               </div>
+
+              {selectedTask.accessFriendly && (
+                <Badge variant="outline" className="bg-eco-blue/10 text-eco-blue border-eco-blue/20">
+                  <Accessibility className="h-3.5 w-3.5 mr-1" /> Wheelchair Accessible
+                </Badge>
+              )}
               
               <div className="bg-muted p-3 rounded-md mt-2 text-sm">
                 <p>{selectedTask.description}</p>
@@ -443,7 +381,7 @@ const EcoDropPage = () => {
                 <TransportMethodSelector 
                   onSelect={handleMethodSelect}
                   onCancel={handleMethodCancel}
-                  accessibleOnly={false}
+                  accessibleOnly={selectedTask.accessFriendly}
                 />
               ) : (
                 <div className="flex items-center justify-between mt-4">
@@ -477,23 +415,13 @@ const EcoDropPage = () => {
         </DialogContent>
       </Dialog>
 
-      {/* MoveMate+ Rental Details Popup */}
-      {selectedVehicleType && (
-        <RentalDetailsPopup
-          open={showRentalPopup}
-          onClose={() => setShowRentalPopup(false)}
-          onConfirm={handleRentalConfirm}
-          vehicleType={selectedVehicleType}
-        />
-      )}
-
       {/* Nearby Tasks Sheet */}
       <Sheet open={isNearbyTasksOpen} onOpenChange={setIsNearbyTasksOpen}>
         <SheetContent side="bottom" className="h-[80vh] rounded-t-xl">
           <SheetHeader className="text-left pb-2">
-            <SheetTitle>Tasks Near You</SheetTitle>
+            <SheetTitle>Accessible Tasks Near You</SheetTitle>
             <SheetDescription>
-              Based on your current location in UAE
+              Wheelchair-friendly tasks in your area
             </SheetDescription>
           </SheetHeader>
           
@@ -516,4 +444,4 @@ const EcoDropPage = () => {
   );
 };
 
-export default EcoDropPage;
+export default AccessDropPage;

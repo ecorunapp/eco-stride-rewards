@@ -9,6 +9,7 @@ import Layout from "@/components/layout/Layout";
 import Home from "@/pages/Home";
 import WalletPage from "@/pages/WalletPage";
 import EcoDropPage from "@/pages/EcoDropPage";
+import AccessDropPage from "@/pages/AccessDropPage";
 import ProfilePage from "@/pages/ProfilePage";
 import MeetFlarePage from "@/pages/MeetFlarePage";
 import RunfluencePage from "@/pages/RunfluencePage";
@@ -32,6 +33,7 @@ const App = () => (
               <Route path="movemate" element={<MoveMatePage />} />
               <Route path="wallet" element={<WalletPage />} />
               <Route path="ecodrop" element={<EcoDropPage />} />
+              <Route path="accessdrop" element={<AccessDropPage />} />
               <Route path="profile" element={<ProfilePage />} />
             </Route>
             <Route path="*" element={<NotFound />} />
